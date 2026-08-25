@@ -1,0 +1,63 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: NewOrange.spec.js >> Window Handling
+- Location: tests\NewOrange.spec.js:20:5
+
+# Error details
+
+```
+TypeError: context.newPage is not a function
+```
+
+# Test source
+
+```ts
+  1  | import{test,expect, chromium} from '@playwright/test';
+  2  | 
+  3  | 
+  4  | 
+  5  | test('NewOrange login', async ({ page }) => {
+  6  | 
+  7  |     await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login', { waitUntil: 'networkidle' });
+  8  | 
+  9  |     //Login Page
+  10 |     const Logo = await page.getByAltText('company-branding')
+  11 |     expect(Logo).toBeVisible({ timeout: 5000 });
+  12 | 
+  13 |     await page.getByPlaceholder('Username').fill('Admin');
+  14 |     await page.getByRole('password').fill('admin123');
+  15 | 
+  16 |     await page.getByRole('button', { name: 'Login' }).click();
+  17 | 
+  18 | })
+  19 | 
+  20 | test('Window Handling', async()=>{
+  21 |     
+  22 |     const browser = await chromium.launch();
+  23 |     const context = await browser.newPage();
+> 24 |     const page1 = await context.newPage();
+     |                                 ^ TypeError: context.newPage is not a function
+  25 | 
+  26 |     await page1.goto('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login')
+  27 |     await expect(page1).toHaveTitle('OrangeHRM');
+  28 | 
+  29 |     const page2 = context.waitForEvent('page');
+  30 |     await page1.locator('//a[normalize-space()="OrangeHRM, Inc"]').click()
+  31 |     
+  32 | 
+  33 |     const newPage = await page2;
+  34 |     await newPage.waitForLoadState();
+  35 |     await expect(newPage).toHaveTitle('OrangeHRM HR Software | Free & Open Source HR Software | HRMS | HRIS | OrangeHRM');
+  36 |     await newPage.close();
+  37 |     await page1.bringToFront();
+  38 |     await expect(page1).toHaveTitle('OrangeHRM');
+  39 | 
+  40 | 
+  41 | })
+```
